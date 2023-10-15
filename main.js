@@ -41,10 +41,34 @@ function animate() {
 
 renderer.setAnimationLoop(animate);
 
+
 window.addEventListener('resize', function () {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    console.log( camera.position ); 
+    // console.log( camera.position ); CURRENT CAMERA
+}
+);
 
-});
+
+const pointer  = new THREE.Vector2() ;
+const raycaster = new THREE.Raycaster();
+
+
+
+//raycasting/mouse detection
+const onMouseMove = (event) => {
+
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(pointer,camera);
+    const intersects = raycaster.intersectObjects(scene.children);
+
+    for (let i=0; i<intersects.length; i++) {
+        intersects[i].object.material.color.set(0x0000FF) //blue for now
+    }
+
+}  
+
+window.addEventListener("mousemove",onMouseMove);
