@@ -1,9 +1,9 @@
 class MidiHandler {
-    constructor(instrumentNumber) {
+    constructor(instrumentNumber, playSoundFunction) {
         this.instrumentNumber = instrumentNumber;
+        this.playSound = playSoundFunction; // Store the reference to the playSound function
         this.lastHoveredKey = null;
         
-
         if (navigator.requestMIDIAccess) {
             navigator.requestMIDIAccess({ sysex: false }).then(this.onMIDISuccess.bind(this), this.onMIDIFailure);
         } else {
@@ -19,7 +19,6 @@ class MidiHandler {
             return;
         }
 
-       
         inputs.forEach(input => {
             input.onmidimessage = this.onMIDIMessage.bind(this);
         });
@@ -29,30 +28,23 @@ class MidiHandler {
         console.error("Failed to access MIDI devices:", error);
     }
 
-    playNoteIfNeeded(note) {
-        if (note && this.lastHoveredKey !== note) {
-            this.playSound(note,instrumentNumber);
-            this.lastHoveredKey = note;
-        }
-    }
-
     onMIDIMessage(event) {
-        if (!event.data || event.data.length < 3) return; // Add this check
+        if (!event.data || event.data.length < 3) return;
 
         const command = event.data[0] & 0xf0;
         const noteNumber = event.data[1];
         const velocity = event.data[2];
 
-        if (command === 0x90 && velocity > 0) {
+        if (command === 0x90 && velocity > 0) { // Note on
             const note = this.mapMIDIEventToNote(noteNumber);
             if (note) {
-                this.playSound(note,this.instrumentNumber);
+                this.playSound(note, this.instrumentNumber); // Call the playSound function
             }
         }
     }
 
     mapMIDIEventToNote(noteNumber) {
-        if (typeof noteNumber !== 'number') return null; 
+        if (typeof noteNumber !== 'number') return null;
         return this.midiNumberToNoteName(noteNumber);
     }
 
@@ -66,9 +58,6 @@ class MidiHandler {
 
         return noteNames[noteIndex] + octave;
     }
-
-    
- 
 }
 
 export default MidiHandler;

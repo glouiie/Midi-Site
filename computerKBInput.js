@@ -13,28 +13,29 @@ function getPressableKeys() {
         "Y": `G#${octave}`,
         "H": `A${octave}`,
         "U": `A#${octave}`,
-        "J": `B${octave}`
+        "J": `B${octave}`,
+        "L": `C${octave+1}`,
+
     };
 }
 
-console.log(octave);
 
 function handleKeyDown(event, playSoundCallback, getInstrumentNumber) {
     const keyPressed = event.key.toUpperCase();
+
     if (keyPressed === 'Z' && octave > 0) {
         octave -= 1;
-        console.log(octave);
 
     }
     if (keyPressed === 'X' && octave < 5) {
         octave += 1;
-console.log(octave);
 
     }
     
     const pressableKeys = getPressableKeys();
     if (pressableKeys.hasOwnProperty(keyPressed)) {
         const note = pressableKeys[keyPressed];
+        console.log("Note Played:", note);
         if (playSoundCallback && getInstrumentNumber) {
             const instrumentNumber = getInstrumentNumber();
             playSoundCallback(note, instrumentNumber);
@@ -44,7 +45,7 @@ console.log(octave);
 
 function initializeKeyboardInput(playSoundCallback, getInstrumentNumber) {
     document.addEventListener("keydown", (event) => handleKeyDown(event, playSoundCallback, getInstrumentNumber));
+   
 }
-
 
 export { getPressableKeys, initializeKeyboardInput };

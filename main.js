@@ -10,6 +10,7 @@ import { pianoSounds,TextArray } from './instruments';
 import {initializeKeyboardInput } from './computerKBInput';
 
 const getInstrumentNumber = () => instrumentNumber;
+
 initializeKeyboardInput(playSound, getInstrumentNumber);
 
 
@@ -17,11 +18,10 @@ initializeKeyboardInput(playSound, getInstrumentNumber);
 let instrumentNumber = 0;
 
 
-const midiHandler = new MidiHandler(instrumentNumber);
+const midiHandler = new MidiHandler(instrumentNumber, playSound);
 
-midiHandler.playSound = (note) => {
-    pianoSounds[instrumentNumber].playSound(note);
-};
+
+
 
 //todo add max zoomout level
 //todo add modal for click to initialize sound but i think ive done that lol
@@ -72,6 +72,8 @@ var light = new THREE.AmbientLight(0xffffff,0.5);
 scene.add(light);
 
 let screenObject = null;
+let noteToObjectMap = {};
+
 
 const loader = new GLTFLoader();
 loader.load("assets/NewNamesPiano.gltf", (gltf) => {
@@ -81,12 +83,15 @@ loader.load("assets/NewNamesPiano.gltf", (gltf) => {
     model.scale.set(1, 1, 1);
 
     model.traverse((child) => {
-        console.log(child.name)
+        if (child.name.startsWith("Key")) {
+            const note = child.name.split('_')[1];
+            noteToObjectMap[note] = child;
+        }
+        
         if (child.name === "Screen") {
             screenObject = child;
-
-       
         }
+
     });
 
     scene.add(model);
@@ -96,7 +101,7 @@ function animate() {
     if (screenObject && cPointLabel) {
         cPointLabel.position.set(0.00008872120815794915,0.45154336750507355,-0.7542221546173096);
     }
-
+    
 
     renderer.render(scene, camera);
     labelRenderer.render(scene, camera);
@@ -108,21 +113,36 @@ window.addEventListener('resize', function () {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    labelRenderer.setSize(this.window.innerWidth, rhi.swindow.innerHeight);
-    // console.log( camera.position ); CURRENT CAMERA
+    labelRenderer.setSize(this.window.innerWidth, this.window.innerHeight);
 }
 );
 
 
 
+function playSound(noteName, instNumber) {
+    const keyObject = noteToObjectMap[noteName];
 
-function playSound(note,number) {
-    pianoSounds[number].playSound(note);
+
+    if (keyObject) {
+        highlightObject(keyObject, blueColour);
+
+        
+        if (highlightTimers.has(keyObject)) {
+            clearTimeout(highlightTimers.get(keyObject));
+        }
+
+        
+        const timer = setTimeout(() => {
+            resetHighlightedObject()
+            clearAllHighlights() 
+        }, 60); 
+
+        highlightTimers.set(keyObject, timer);
+    }
+
+    pianoSounds[instNumber].playSound(noteName);
 }
 
-const originalMaterials = new Map();
-
-let selectedObject = null;
 let lastHoveredKey = null;
 
 
@@ -133,25 +153,38 @@ function getPointerPosition(event) {
     };
 }
 
-function resetSelectedObject() {
-    if (selectedObject) {
-        selectedObject.material = originalMaterials.get(selectedObject);
-        selectedObject = null;
-    }
-}
+
+const originalMaterials = new Map();
+
+let highlightedObjects = [];
+
+
+const highlightTimers = new Map();
+
 function highlightObject(object, color) {
-    originalMaterials.set(object, object.material); 
-    const highlightMaterial = new THREE.MeshBasicMaterial({ color: color }); 
-    object.material = highlightMaterial;
-    selectedObject = object;
+    if (object) {
+        
+        originalMaterials.set(object, object.material);
+        const highlightMaterial = new THREE.MeshBasicMaterial({ color: color });
+        object.material = highlightMaterial;
+        highlightedObjects.push(object);
+
+    }
 }
 
-function playDifferentSound(note) {
-    if (note !== lastHoveredKey) {
-        playSound(note, instrumentNumber);
-        lastHoveredKey = note;
+function resetHighlightedObject(object) {
+    if (object) {
+        object.material = originalMaterials.get(object);
+        highlightedObjects = highlightedObjects.filter(obj => obj !== object);
     }
 }
+
+
+function clearAllHighlights() {
+    highlightedObjects.forEach(resetHighlightedObject);
+    highlightedObjects = [];
+}
+
 
 function handleInstrumentChange(direction) {
     instrumentNumber += direction;
@@ -166,51 +199,40 @@ function handleInstrumentChange(direction) {
 
 const blueColour =  0x0000FF 
 
+let currentlyHoveredObject = null;
+
 function objectSelect(event) {
     const raycaster = new THREE.Raycaster();
     const pointerPosition = getPointerPosition(event);
     raycaster.setFromCamera(pointerPosition, camera);
 
-    const intersects = raycaster.intersectObjects(scene.children);
-    resetSelectedObject();
-
+    const intersects = raycaster.intersectObjects(Object.values(noteToObjectMap)); 
     if (intersects.length > 0) {
-
-        const object = intersects[0].object;
-        const objectName = object.name;
-
-        
-
-        const highligthable = ["Key","Selector"]
-        
-        const isHighlightable = highligthable.some(name => objectName.startsWith(name));
-
-        if (isHighlightable) {
-            highlightObject(object, blueColour); 
-        }
-        
+        const intersectedObject = intersects[0].object;
+        const objectName = intersectedObject.name;
 
         if (objectName.startsWith("Key")) {
             const note = objectName.split('_')[1];
-            playDifferentSound(note);
+            if (intersectedObject !== currentlyHoveredObject) {
+                playSound(note, instrumentNumber);
+                currentlyHoveredObject = intersectedObject;
+            }
+        } else {
+            currentlyHoveredObject = null;
         }
-        
 
         if (event.type === 'click') {
-
             if (objectName === "Selector_Left") {
                 handleInstrumentChange(-1);
-                
             } else if (objectName === "Selector_Right") {
                 handleInstrumentChange(1);
             }
             keyboardText.textContent = TextArray[instrumentNumber];
-            
         }
+        
     } else {
-        lastHoveredKey = null;
-    }
-}
+        currentlyHoveredObject = null;    
+    }}
 
 
 
