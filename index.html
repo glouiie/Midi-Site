@@ -7,7 +7,22 @@
 			body { margin: 0; }
 		</style>
 	</head>
-	<body>
+
+	<!-- ALL GOING TO BE COLLAPSIBLE  -->
+
+	<div class="Size-Control">
+		<button id="loadSmallPiano">Small</button>
+		<button id="loadBigPiano">Big</button>
+	</div>
+
+	<div class="Midi Control">
+		<input type="file" id="midiFileInput" accept=".mid, .midi" />
+		<input type="range" id="MidiSpeed" min="0.5" max="2" step="0.01" />
+		<span id="currentValue">1</span>
+		
+	</div>
+
+
 		<script type="module" src="/main.js"></script>
 	</body>
 </html>

@@ -18,7 +18,7 @@ class Instrument {
     }
     playSound(note) {
         if (this.sampler) {
-            this.sampler.triggerAttackRelease(note, "8n");
+            this.sampler.triggerAttackRelease(note, "4n");
         }
     }
 }

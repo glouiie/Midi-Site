@@ -1,7 +1,9 @@
+import { resetHighlightedObjects,noteToObjectMap } from "./main";
+
 class MidiHandler {
     constructor(instrumentNumber, playSoundFunction) {
         this.instrumentNumber = instrumentNumber;
-        this.playSound = playSoundFunction; // Store the reference to the playSound function
+        this.playSound = playSoundFunction; 
         this.lastHoveredKey = null;
         
         if (navigator.requestMIDIAccess) {
@@ -30,18 +32,24 @@ class MidiHandler {
 
     onMIDIMessage(event) {
         if (!event.data || event.data.length < 3) return;
-
+    
         const command = event.data[0] & 0xf0;
         const noteNumber = event.data[1];
         const velocity = event.data[2];
-
-        if (command === 0x90 && velocity > 0) { // Note on
+    
+        if (command === 0x90 && velocity > 0) {  // Note on
             const note = this.mapMIDIEventToNote(noteNumber);
             if (note) {
-                this.playSound(note, this.instrumentNumber); // Call the playSound function
+                this.playSound(note, this.instrumentNumber);
+            }
+        } else if (command === 0x90 && velocity === 0 || command === 0x80) {  // Note off
+            const note = this.mapMIDIEventToNote(noteNumber);
+            if (note && noteToObjectMap[note]) {
+                resetHighlightedObjects(noteToObjectMap[note]);
             }
         }
     }
+    
 
     mapMIDIEventToNote(noteNumber) {
         if (typeof noteNumber !== 'number') return null;

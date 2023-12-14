@@ -1,4 +1,12 @@
+import { resetHighlightedObjects,noteToObjectMap,handleInstrumentChange } from "./main";
+
 let octave = 3;
+
+let PRESSED_KEYS = new Set();
+const pressableKeys = getPressableKeys(); //immutable so fine
+
+
+//MINOR BUG if you change octaves the keys dont reset their highlights to fix change scope of notename and what not OR refactor so reset can be used globally
 
 function getPressableKeys() {
     return {
@@ -14,38 +22,60 @@ function getPressableKeys() {
         "H": `A${octave}`,
         "U": `A#${octave}`,
         "J": `B${octave}`,
-        "L": `C${octave+1}`,
+        "K": `C${octave+1}`,
+        "O": `C#${octave+1}`,
+        "L": `D${octave+1}`,
+        "P": `D#${octave+1}`,
+        ";": `E${octave+1}`,
+        "'": `F${octave+1}`,
+        "]": `F#${octave+1}`,
+        "#": `G${octave+1}`,
 
     };
 }
 
-
-function handleKeyDown(event, playSoundCallback, getInstrumentNumber) {
+function handleKeyDown(event, playSoundFunction, getInstrumentNumber) {
     const keyPressed = event.key.toUpperCase();
 
-    if (keyPressed === 'Z' && octave > 0) {
-        octave -= 1;
+    if (!PRESSED_KEYS.has(keyPressed)) {
+        if (keyPressed === 'Z' && octave > 1) {
+            octave -= 1;
+        }
+        if (keyPressed === 'X' && octave < 5) {
+            octave += 1;
+        }
 
-    }
-    if (keyPressed === 'X' && octave < 5) {
-        octave += 1;
+        if (keyPressed === '=' || keyPressed === '-') {
+            const direction = keyPressed === '+' ? 1 : -1;
+            handleInstrumentChange(direction);
+        }
 
-    }
-    
-    const pressableKeys = getPressableKeys();
-    if (pressableKeys.hasOwnProperty(keyPressed)) {
-        const note = pressableKeys[keyPressed];
-        console.log("Note Played:", note);
-        if (playSoundCallback && getInstrumentNumber) {
-            const instrumentNumber = getInstrumentNumber();
-            playSoundCallback(note, instrumentNumber);
+        if (pressableKeys.hasOwnProperty(keyPressed)) {
+            const note = pressableKeys[keyPressed];
+            if (playSoundFunction && getInstrumentNumber) {
+                const instrumentNumber = getInstrumentNumber();
+                playSoundFunction(note, instrumentNumber);
+            }
+            PRESSED_KEYS.add(keyPressed);
         }
     }
 }
 
-function initializeKeyboardInput(playSoundCallback, getInstrumentNumber) {
-    document.addEventListener("keydown", (event) => handleKeyDown(event, playSoundCallback, getInstrumentNumber));
-   
+function handleKeyUp(event) {
+    const keyReleased = event.key.toUpperCase();
+    PRESSED_KEYS.delete(keyReleased);
+
+    if (pressableKeys.hasOwnProperty(keyReleased)) {
+        const noteName = pressableKeys[keyReleased];
+        if (noteName && noteToObjectMap[noteName]) {
+            resetHighlightedObjects(noteToObjectMap[noteName]);
+        }
+    }
+}
+
+function initializeKeyboardInput(playSoundFunction, getInstrumentNumber) {
+    document.addEventListener("keydown", (event) => handleKeyDown(event, playSoundFunction, getInstrumentNumber));
+    document.addEventListener("keyup", handleKeyUp);
 }
 
 export { getPressableKeys, initializeKeyboardInput };
