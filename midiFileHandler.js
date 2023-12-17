@@ -1,43 +1,62 @@
 import { Midi } from '@tonejs/midi';
-import { resetHighlightedObjects, noteToObjectMap } from './main';
+import { resetHighlightedObjects, noteToObjectMap, playSound, getInstrumentNumber } from './main';
 
 
-let speed = 0
+document.addEventListener("DOMContentLoaded", function() {
+    const slider = document.getElementById('midiSlider');
+    const sliderValueDisplay = document.getElementById('sliderValue');
 
-//TODO add it so you can go through the song at a specific time 0:23 seconds for example
+    function updateMidiLength(newLength) {
+        slider.max = newLength;
+        sliderValueDisplay.textContent = '0s / ' + newLength + 's';
+    }
 
-// const rangeInput = document.getElementById("MidiSpeed");
-// const currentValueSpan = document.getElementById("currentValue");
+    slider.addEventListener('input', function() {
+        sliderValueDisplay.textContent = slider.value + 's / ' + slider.max + 's';
+    });
 
-// rangeInput.value = 1;
-// currentValueSpan.textContent = 1;
+    slider.addEventListener('change', function() {
+        seekToTime(parseInt(slider.value));
+    });
+    
 
+    window.updateMidiLength = updateMidiLength;
+});
 
-// rangeInput.addEventListener("input", function () {
-//     const displayedSpeed = parseFloat(rangeInput.value);
-//     speed = 1 / displayedSpeed;
-//     currentValueSpan.textContent = displayedSpeed;
-// });
+let currentFile; 
+let timeouts = []; 
+let currentStartTime = 0; 
 
-function loadMidiFile(file, playSound, getInstrumentNumber, jumpToTime = 0) {
+function loadMidiFile(file, playSound, getInstrumentNumber, startTime = 0) {
+    currentFile = file; 
+    currentStartTime = startTime; 
     const reader = new FileReader();
 
     reader.onload = function(e) {
         const midi = new Midi(e.target.result);
+        updateMidiLength(Math.floor(midi.duration)); 
+
         midi.tracks.forEach(track => {
             track.notes.forEach(note => {
-                if (note.time >= jumpToTime) {
-                    setTimeout(() => {
+                const noteStartTime = note.time;
+                const noteEndTime = noteStartTime + note.duration;
+
+                if (noteEndTime > startTime) {
+                    const delay = Math.max(noteStartTime - startTime, 0) * 1000;
+                    const duration = (noteEndTime - Math.max(startTime, noteStartTime)) * 1000;
+
+                    const timeout = setTimeout(() => {
                         const instrumentNumber = getInstrumentNumber();
                         playSound(note.name, instrumentNumber);
-                        
+
+                        updateSliderPosition(noteStartTime);
+
                         setTimeout(() => {
                             resetHighlightedObjects(noteToObjectMap[note.name]);
-                        }, note.duration * 1000 / speed); 
-                    }, (note.time - jumpToTime) * 1000 * speed); 
+                        }, duration); 
+                    }, delay);
 
-                    console.log(speed)
-                   
+                    timeouts.push(timeout); 
                 }
             });
         });
@@ -46,6 +65,20 @@ function loadMidiFile(file, playSound, getInstrumentNumber, jumpToTime = 0) {
     reader.readAsArrayBuffer(file);
 }
 
+function updateSliderPosition(time) {
+    const slider = document.getElementById('midiSlider');
+    const sliderValueDisplay = document.getElementById('sliderValue');
+    const roundedTime = Math.floor(time); 
+    slider.value = roundedTime;
+    sliderValueDisplay.textContent = roundedTime + 's / ' + slider.max + 's';
+}
 
 
-export {loadMidiFile}
+function seekToTime(newTime) {
+    timeouts.forEach(clearTimeout);
+    timeouts = [];
+    loadMidiFile(currentFile, playSound, getInstrumentNumber, newTime);
+    updateSliderPosition(newTime);
+}
+
+export { loadMidiFile };
