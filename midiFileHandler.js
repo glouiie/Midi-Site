@@ -67,7 +67,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function setPlaybackSpeed(speed) {
-        console.log("hi")
         currentPlaybackSpeed = speed;
         if (currentFile) {
             seekToTime(parseInt(document.getElementById('midiSlider').value));

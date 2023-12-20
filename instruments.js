@@ -18,7 +18,7 @@ class Instrument {
     }
     playSound(note) {
         if (this.sampler) {
-            this.sampler.triggerAttackRelease(note, "4n");
+            this.sampler.triggerAttackRelease(note, "4n"); //TODO make attack release variable based on how long note is held down for
         }
     }
 }
@@ -26,6 +26,11 @@ class Instrument {
 const GrandPiano = new Instrument("Grand Piano", {
     C3: "keyboard sounds/grand piano/Piano C3.mp3"
 });
+
+const Rhodes = new Instrument("Rhodes", {
+    C3: "keyboard sounds/rhodes/rhodes.mp3"
+});
+
 
 const CatPiano = new Instrument("Cat Piano", {
     E3: "keyboard sounds/cat piano/meow.wav"

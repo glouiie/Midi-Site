@@ -3,25 +3,45 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Piano app</title>
-		<style>
-			body { margin: 0; }
-		</style>
+		<link rel="stylesheet" href="style.css">
 	</head>
 
-	<!-- ALL GOING TO BE COLLAPSIBLE  -->
+	<!-- ALL GOING TO BE COLLAPSABLE  -->
 
-	<div class="Size-Control">
-		<button id="loadSmallPiano">Small</button>
-		<button id="loadBigPiano">Big</button>
-	</div>
 
-	<div class="Midi Control">
-		<input type="file" id="midiFileInput" accept=".mid, .midi" />
-		<input type="range" id="MidiSpeed" min="0.5" max="2" step="0.01" />
-		<span id="currentValue">1</span>
+	<div class="flex-container">
+		<div class="Midi-Control">
 		
-	</div>
+			<input type="file" id="midiFileInput" accept=".mid, .midi" /> 
+	
+			<div class="time-slider">
+				<input type="range" id="midiSlider" min="0" value="0" step="1">
+				<div id="sliderValue">0s</div>
+			</div>
 
+			<div id="speedControls">
+				<button id="halfSpeed">0.5x</button>
+				<button id="normalSpeed">1x</button>
+				<button id="doubleSpeed">2x</button>
+			</div>
+			<div>
+				
+				<button id="setLoopButton">Set Loop Point</button>
+				<button id="clearLoopButton">Clear Loop Points</button>
+			</div>
+			
+			
+		</div>
+			
+		<div class="Size-Control-Center">
+			<div class="Size-Control">
+				<button id="loadSmallPiano">Small</button>
+				<button id="loadBigPiano">Big</button>
+			</div>
+		</div>
+
+	</div>
+	
 
 		<script type="module" src="/main.js"></script>
 	</body>

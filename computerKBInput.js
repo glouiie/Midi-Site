@@ -3,10 +3,7 @@ import { resetHighlightedObjects,noteToObjectMap,handleInstrumentChange } from "
 let octave = 3;
 
 let PRESSED_KEYS = new Set();
-const pressableKeys = getPressableKeys(); //immutable so fine
-
-
-//MINOR BUG if you change octaves the keys dont reset their highlights to fix change scope of notename and what not OR refactor so reset can be used globally
+let pressableKeys = getPressableKeys(); 
 
 function getPressableKeys() {
     return {
@@ -34,23 +31,30 @@ function getPressableKeys() {
     };
 }
 
+function updatePressableKeys() {
+    pressableKeys = getPressableKeys();
+}
+
 function handleKeyDown(event, playSoundFunction, getInstrumentNumber) {
     const keyPressed = event.key.toUpperCase();
 
-    if (!PRESSED_KEYS.has(keyPressed)) {
-        if (keyPressed === 'Z' && octave > 1) {
-            octave -= 1;
-        }
-        if (keyPressed === 'X' && octave < 5) {
-            octave += 1;
-        }
+    if (keyPressed === 'Z' && octave > 1) {
+        octave--;
 
+        updatePressableKeys();
+    } 
+    else if (keyPressed === 'X' && octave < 5) {
+        octave++;
+        updatePressableKeys();
+    }
+
+    if (!PRESSED_KEYS.has(keyPressed)) {
         if (keyPressed === '=' || keyPressed === '-') {
-            const direction = keyPressed === '+' ? 1 : -1;
+            const direction = keyPressed === '=' ? +1 : -1;
             handleInstrumentChange(direction);
         }
 
-        if (pressableKeys.hasOwnProperty(keyPressed)) {
+        if (pressableKeys[keyPressed]) {
             const note = pressableKeys[keyPressed];
             if (playSoundFunction && getInstrumentNumber) {
                 const instrumentNumber = getInstrumentNumber();
@@ -65,7 +69,7 @@ function handleKeyUp(event) {
     const keyReleased = event.key.toUpperCase();
     PRESSED_KEYS.delete(keyReleased);
 
-    if (pressableKeys.hasOwnProperty(keyReleased)) {
+    if (pressableKeys[keyReleased]) {
         const noteName = pressableKeys[keyReleased];
         if (noteName && noteToObjectMap[noteName]) {
             resetHighlightedObjects(noteToObjectMap[noteName]);
