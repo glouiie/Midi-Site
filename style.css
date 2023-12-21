@@ -8,6 +8,37 @@ body {
   padding: 0;
 }
 
+.Selection{
+  display: flex;
+  justify-content: center;
+  gap: 2REM;
+}
+
+
+#Midi-Control-Toggle{
+  margin-top: 1rem;
+  width: 5rem;
+
+
+}
+
+#Midi-Control-Toggle:hover{
+  cursor: pointer;
+  filter: invert(74%) sepia(23%) saturate(4035%) hue-rotate(177deg) brightness(101%) contrast(101%);
+}
+
+#Effects-Control-Toggle{
+  margin-top: 1.2rem;
+  width: 5rem;
+
+}
+
+#Effects-Control-Toggle:hover{
+  cursor: pointer;
+  filter: invert(74%) sepia(23%) saturate(4035%) hue-rotate(177deg) brightness(101%) contrast(101%);
+
+}
+
 .time-slider{
   display: flex;
 }
@@ -20,28 +51,33 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 10%; /* Adjust the height as needed */
-}
-
-.Midi-Control {
-  padding-top: 1rem;
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-}
-
-.Midi-Control {
-  padding-top: 1rem;
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-}
-
-.Size-Control-Center {
+  height: 10%; 
+  margin-top: 1rem;
   
-  display: flex;
+}
+
+.Midi-Control {
+  display: none;
+  padding-top: 1rem;
+  justify-content: center;
+  gap: 2rem;
+}
+.Size-Control-Center {
+  display: none;
   justify-content: center;
   width: 100%;
   padding-bottom: 1rem;
   padding-top: .5rem;
+
+}
+#exit-icon{
+  width: 3rem;
+  filter: invert(11%) sepia(57%) saturate(5372%) hue-rotate(8deg) brightness(98%) contrast(120%);
+
+
+}
+
+#exit-icon:hover{
+  cursor: pointer;
+  filter: none;
 }

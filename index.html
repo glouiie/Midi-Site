@@ -6,12 +6,21 @@
 		<link rel="stylesheet" href="style.css">
 	</head>
 
-	<!-- ALL GOING TO BE COLLAPSABLE  -->
-
+	
 
 	<div class="flex-container">
+
+
+
+		<div class="Selection">
+			<img id="Midi-Control-Toggle" src="assets/piano_icon.svg" alt="Icon For Midi Control" title="Midi Controls">
+			<img id="Effects-Control-Toggle" src="assets/effects_icon.svg" alt="Icon For Sound Effects" title="Sound Effects">
+		</div>
+
 		<div class="Midi-Control">
-		
+			
+
+			
 			<input type="file" id="midiFileInput" accept=".mid, .midi" /> 
 	
 			<div class="time-slider">
@@ -30,6 +39,8 @@
 				<button id="clearLoopButton">Clear Loop Points</button>
 			</div>
 			
+			<img id="exit-icon" src="assets/exit.svg" alt="">
+			
 			
 		</div>
 			
@@ -40,9 +51,13 @@
 			</div>
 		</div>
 
+
+
 	</div>
 	
 
 		<script type="module" src="/main.js"></script>
+		<script src="/ui-interactions.js"></script>
+
 	</body>
 </html>
