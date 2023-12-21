@@ -1,22 +1,22 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader';
-import MidiHandler from './midiInput';
-import { pianoSounds,TextArray } from './instruments';
-import {initializeKeyboardInput } from './computerKBInput';
-import { loadMidiFile } from './midiFileHandler';
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader";
+import MidiHandler from "./midiInput";
+import { pianoSounds,TextArray } from "./instruments";
+import {initializeKeyboardInput } from "./computerKBInput";
+import { loadMidiFile } from "./midiFileHandler";
 
 // put this in seperate file or dont idc
-document.getElementById('loadSmallPiano').addEventListener('click', function() {
-    loadPianoModel('smaller_piano.gltf');
+document.getElementById("loadSmallPiano").addEventListener("click", function() {
+    loadPianoModel("smaller_piano.gltf");
 });
 
-document.getElementById('loadBigPiano').addEventListener('click', function() {
-    loadPianoModel('bigger_piano.gltf');
+document.getElementById("loadBigPiano").addEventListener("click", function() {
+    loadPianoModel("bigger_piano.gltf");
 });
 
 
-document.getElementById('midiFileInput').addEventListener('change', function(event) {
+document.getElementById("midiFileInput").addEventListener("change", function(event) {
     const file = event.target.files[0];
     if (file) {
         loadMidiFile(file, playSound, getInstrumentNumber);
@@ -61,10 +61,9 @@ function animate() {
 renderer.setAnimationLoop(animate);
 
 //adding text to screen
-let currentPianoModel =" "
 function updateInstrumentLabel(instrumentName) {
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
 
     canvas.width = 850; 
     canvas.height = 300;
@@ -72,13 +71,13 @@ function updateInstrumentLabel(instrumentName) {
     context.translate(0, canvas.height);
     context.scale(1, -1);
   
-    context.fillStyle = 'white';
+    context.fillStyle = "white";
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     context.font = `150px Comic Sans MS`;
-    context.fillStyle = 'black';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
+    context.fillStyle = "black";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
 
     context.fillText(instrumentName, canvas.width / 2, canvas.height / 2);
 
@@ -87,7 +86,7 @@ function updateInstrumentLabel(instrumentName) {
     texture.minFilter = THREE.LinearFilter; 
 
     scene.traverse((object) => {
-        if (object.material && object.material.name === 'Front Face') {
+        if (object.material && object.material.name === "Front Face") {
             object.material.map = texture;
             object.material.transparent = true;
             object.material.needsUpdate = true;
@@ -99,16 +98,25 @@ let noteToObjectMap = {};
 let Selector_Left = null
 let Selector_Right = null
 
+
+
+
+let pianoModelName = "" //to fix a bug of playing notes that arent there
+
 const loader = new GLTFLoader();
 function loadPianoModel(filename) {
 
-    currentPianoModel = filename
+    pianoModelName = filename;
+
+
 
     loader.load(`assets/${filename}`, (gltf) => {
         if (scene.children.some(child => child.name === "PianoModel")) {
             const existingModel = scene.children.find(child => child.name === "PianoModel");
             scene.remove(existingModel);
         }
+
+
         const model = gltf.scene;
         model.name = "PianoModel";
         model.position.set(0, 0, 0);
@@ -118,7 +126,7 @@ function loadPianoModel(filename) {
 
         model.traverse((child) => {
             if (child.name.startsWith("Key")) {
-                const note = child.name.split('_')[1];
+                const note = child.name.split("_")[1];
                 noteToObjectMap[note] = child; 
             }
             
@@ -137,12 +145,12 @@ function loadPianoModel(filename) {
     });
 
 }
-loadPianoModel("bigger_piano.gltf");
+loadPianoModel("smaller_piano.gltf");
 //smaller_piano.gltf
 //bigger_piano.gltf
 
 
-window.addEventListener('resize', function () {
+window.addEventListener("resize", function () {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -242,7 +250,7 @@ function performRaycasting(event) {
                 }
             }
             if (intersectedObject.name.startsWith("Key")) {
-                let noteName = intersectedObject.name.split('_')[1];
+                let noteName = intersectedObject.name.split("_")[1];
                 newlyHoveredObjects.add(intersectedObject);
 
                 if (!currentlyHoveredObjects.has(intersectedObject)) {
@@ -266,12 +274,40 @@ window.addEventListener("mousemove", objectSelect);
 
 //music stuff
 function playSound(noteName, instNumber) {
-    const keyObject = noteToObjectMap[noteName];
-    if (keyObject) {
-        highlightObject(keyObject, blueColour);
+    const note = noteName.slice(0, -1);
+    const octave = parseInt(noteName.slice(-1));
+
+    let minNote, minOctave, maxNote, maxOctave;
+
+    //this is a really bad fix for a bug so that you cant play invisible notes but the performance is still fine so....
+    //but it also makes it only play the notes that can be seen when importing the song so win win!
+    if (pianoModelName === "bigger_piano.gltf"){
+        minNote = "C";
+        minOctave = 1;
+        maxNote = "E";
+        maxOctave = 6;
     }
-    pianoSounds[instNumber].playSound(noteName);
+
+    if (pianoModelName === "smaller_piano.gltf"){
+        minNote = "C";
+        minOctave = 3;
+        maxNote = "C";
+        maxOctave = 5;
+    }
+
+    // Make sure it"s in the keyboard models range
+    if ((octave > minOctave || (octave === minOctave && note >= minNote)) &&
+        (octave < maxOctave || (octave === maxOctave && note <= maxNote))) { 
+        
+        const keyObject = noteToObjectMap[noteName];
+        if (keyObject) {
+            highlightObject(keyObject, blueColour);
+        }
+        pianoSounds[instNumber].playSound(noteName);
+    } 
 }
+
+
 
 function handleInstrumentChange(direction) {
     instrumentNumber += direction;

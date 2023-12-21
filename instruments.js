@@ -18,7 +18,7 @@ class Instrument {
     }
     playSound(note) {
         if (this.sampler) {
-            this.sampler.triggerAttackRelease(note, "4n"); //TODO make attack release variable based on how long note is held down for
+            this.sampler.triggerAttackRelease(note, "4n");
         }
     }
 }

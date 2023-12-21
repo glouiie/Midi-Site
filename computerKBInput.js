@@ -38,6 +38,8 @@ function updatePressableKeys() {
 function handleKeyDown(event, playSoundFunction, getInstrumentNumber) {
     const keyPressed = event.key.toUpperCase();
 
+
+    //need to keep because you dont want users to go to like -100 octave and spend ages coming back
     if (keyPressed === 'Z' && octave > 1) {
         octave--;
 
@@ -45,8 +47,8 @@ function handleKeyDown(event, playSoundFunction, getInstrumentNumber) {
     } 
     else if (keyPressed === 'X' && octave < 5) {
         octave++;
-        updatePressableKeys();
-    }
+        updatePressableKeys(); 
+    } 
 
     if (!PRESSED_KEYS.has(keyPressed)) {
         if (keyPressed === '=' || keyPressed === '-') {

@@ -1,9 +1,6 @@
 import { Midi } from '@tonejs/midi';
 import { resetHighlightedObjects, noteToObjectMap, playSound, getInstrumentNumber } from './main';
 
-//TODO ADD SPEED CONTROLS OF THE MIDI PLAYBACK SPEED
-
-
 let currentFile; 
 let timeouts = []; 
 
@@ -178,3 +175,4 @@ export { loadMidiFile };
 
 //CURRENT BUGS: LOOPING WORKS WEIRDLY WITH THE CHANGE SPEED, THE SLIDER UPDATES THE OPPOSITE WAY ROUND
 //THE LOOP POINTS ARE WRONG BECAUSE IT WORKS OFF OF SECONDS WHICH UPDATES WITH THE 
+//add limits to where it can play notes cause it can now play notes out of range
