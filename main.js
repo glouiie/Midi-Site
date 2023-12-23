@@ -279,15 +279,6 @@ function playSound(noteName, instNumber) {
 
     let minNote, minOctave, maxNote, maxOctave;
 
-    //this is a really bad fix for a bug so that you cant play invisible notes but the performance is still fine so....
-    //but it also makes it only play the notes that can be seen when importing the song so win win!
-    if (pianoModelName === "bigger_piano.gltf"){
-        minNote = "C";
-        minOctave = 1;
-        maxNote = "E";
-        maxOctave = 6;
-    }
-
     if (pianoModelName === "smaller_piano.gltf"){
         minNote = "C";
         minOctave = 3;
@@ -295,9 +286,17 @@ function playSound(noteName, instNumber) {
         maxOctave = 5;
     }
 
-    // Make sure it"s in the keyboard models range
-    if ((octave > minOctave || (octave === minOctave && note >= minNote)) &&
-        (octave < maxOctave || (octave === maxOctave && note <= maxNote))) { 
+    if (pianoModelName === "bigger_piano.gltf"){
+        minNote = "C";
+        minOctave = 1;
+        maxNote = "E";
+        maxOctave = 6;
+    }
+
+
+
+    if ((octave > minOctave || (octave === minOctave && noteCompare(note, minNote) >= 0)) &&
+        (octave < maxOctave || (octave === maxOctave && noteCompare(note, maxNote) <= 0))) { 
         
         const keyObject = noteToObjectMap[noteName];
         if (keyObject) {
@@ -307,7 +306,10 @@ function playSound(noteName, instNumber) {
     } 
 }
 
-
+function noteCompare(note1, note2) {
+    const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+    return notes.indexOf(note1) - notes.indexOf(note2);
+}
 
 function handleInstrumentChange(direction) {
     instrumentNumber += direction;
@@ -320,4 +322,4 @@ function handleInstrumentChange(direction) {
     updateInstrumentLabel(TextArray[instrumentNumber])
 }
 
-export{resetHighlightedObjects,noteToObjectMap,handleInstrumentChange,playSound, getInstrumentNumber}
+export{resetHighlightedObjects,noteToObjectMap,handleInstrumentChange,playSound, getInstrumentNumber,pianoModelName}
