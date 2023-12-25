@@ -34,7 +34,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function onSliderChange() {
-        seekToTime(parseInt(slider.value));
+        const actualTime = parseInt(slider.value) * currentPlaybackSpeed; 
+        seekToTime(actualTime);
     }
 
     function toggleLoopSetting() {
@@ -66,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function setPlaybackSpeed(speed) {
         currentPlaybackSpeed = speed;
         if (currentFile) {
-            seekToTime(parseInt(document.getElementById('midiSlider').value));
+            seekToTime(0);//quick fix so that looping works with different speeds! will fix at some point just need to add more features!
         }
     }
 
@@ -80,9 +81,9 @@ document.addEventListener("DOMContentLoaded", function() {
     setLoopButton.addEventListener('click', toggleLoopSetting);
     clearLoopButton.addEventListener('click', clearLoopPoints);
     
-    document.getElementById('halfSpeed').addEventListener('click', () => setPlaybackSpeed(2));
+    document.getElementById('halfSpeed').addEventListener('click', () => setPlaybackSpeed(0.5));
     document.getElementById('normalSpeed').addEventListener('click', () => setPlaybackSpeed(1));
-    document.getElementById('doubleSpeed').addEventListener('click', () => setPlaybackSpeed(0.5));
+    document.getElementById('doubleSpeed').addEventListener('click', () => setPlaybackSpeed(2));
 
     window.updateMidiLength = updateMidiLength;
 });
@@ -96,11 +97,12 @@ function checkLoopBoundary(time) {
 }
 
 function loadMidiFile(file, playSound, getInstrumentNumber, startTime = 0) {
-
     stopCurrentPlayback();
 
+    console.log(`loadMidiFile: startTime=${startTime}`);
+
     currentFile = file;
-    currentStartTime = startTime;
+    currentStartTime = startTime * currentPlaybackSpeed; 
     const reader = new FileReader();
 
     reader.onload = function(e) {
@@ -109,18 +111,18 @@ function loadMidiFile(file, playSound, getInstrumentNumber, startTime = 0) {
 
         midi.tracks.forEach(track => {
             track.notes.forEach(note => {
-                const noteStartTime = note.time * currentPlaybackSpeed;
-                const noteEndTime = noteStartTime + (note.duration * currentPlaybackSpeed);
+                const noteStartTime = note.time / currentPlaybackSpeed; 
+                const noteEndTime = noteStartTime + (note.duration / currentPlaybackSpeed);
 
-                if (noteEndTime > startTime) {
-                    const delay = Math.max(noteStartTime - startTime, 0) * 1000;
-                    const duration = (noteEndTime - Math.max(startTime, noteStartTime)) * 1000;
+                if (noteEndTime > currentStartTime) {
+                    const delay = Math.max(noteStartTime - currentStartTime, 0) * 1000;
+                    const duration = (noteEndTime - Math.max(currentStartTime, noteStartTime)) * 1000;
 
                     const timeout = setTimeout(() => {
                         const instrumentNumber = getInstrumentNumber();
                         playSound(note.name, instrumentNumber);
 
-                        updateSliderPosition(noteStartTime);
+                        updateSliderPosition(noteStartTime * currentPlaybackSpeed);
 
                         setTimeout(() => {
                             resetHighlightedObjects(noteToObjectMap[note.name]);
@@ -128,6 +130,8 @@ function loadMidiFile(file, playSound, getInstrumentNumber, startTime = 0) {
                     }, delay);
 
                     timeouts.push(timeout); 
+
+                    console.log(`Scheduled note: name=${note.name}, startTime=${noteStartTime}, endTime=${noteEndTime}, delay=${delay}, duration=${duration}`);
                 }
             });
         });
@@ -136,6 +140,10 @@ function loadMidiFile(file, playSound, getInstrumentNumber, startTime = 0) {
 }
 
 function stopCurrentPlayback() {
+
+    console.log('Stopping current playback');
+
+
     timeouts.forEach(timeout => clearTimeout(timeout));
     timeouts = [];
 
@@ -145,12 +153,14 @@ function stopCurrentPlayback() {
 function updateSliderPosition(time) {
     const slider = document.getElementById('midiSlider');
     const sliderValueDisplay = document.getElementById('sliderValue');
-    const roundedTime = Math.floor(time); 
-    slider.value = roundedTime;
-    sliderValueDisplay.textContent = roundedTime + 's / ' + slider.max + 's';
+    const adjustedTime = Math.floor(time / currentPlaybackSpeed); 
+    slider.value = adjustedTime;
+    sliderValueDisplay.textContent = adjustedTime + 's / ' + slider.max + 's';
+    console.log(`updateSliderPosition: time=${time}, adjustedTime=${adjustedTime}, playbackSpeed=${currentPlaybackSpeed}`);
 
-    checkLoopBoundary(roundedTime);
+    checkLoopBoundary(adjustedTime); 
 }
+
 
 function resetSliderAndStartTime() {
     const slider = document.getElementById('midiSlider');
@@ -163,16 +173,17 @@ function resetSliderAndStartTime() {
 
 //function to skip to different playback times using a slider!
 function seekToTime(newTime) {
+    const actualTime = newTime * currentPlaybackSpeed; 
+
+    console.log(`seekToTime: newTime=${newTime}, actualTime=${actualTime}, playbackSpeed=${currentPlaybackSpeed}`);
+
 
     stopCurrentPlayback();
-    loadMidiFile(currentFile, playSound, getInstrumentNumber, newTime);
+    loadMidiFile(currentFile, playSound, getInstrumentNumber, actualTime);
     updateSliderPosition(newTime);
 }
 
 export { loadMidiFile };
 
 
-
-//CURRENT BUGS: LOOPING WORKS WEIRDLY WITH THE CHANGE SPEED, THE SLIDER UPDATES THE OPPOSITE WAY ROUND
-//THE LOOP POINTS ARE WRONG BECAUSE IT WORKS OFF OF SECONDS WHICH UPDATES WITH THE 
-//add limits to where it can play notes cause it can now play notes out of range
+//CURRENT BUG IS YOU CANT USE THE SEEK TO TIME WITH DIFFERENT TIME SPEEDS

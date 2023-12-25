@@ -6,6 +6,7 @@ import { pianoSounds,TextArray } from "./instruments";
 import {initializeKeyboardInput } from "./computerKBInput";
 import { loadMidiFile } from "./midiFileHandler";
 
+
 // put this in seperate file or dont idc
 document.getElementById("loadSmallPiano").addEventListener("click", function() {
     loadPianoModel("smaller_piano.gltf");
