@@ -8,13 +8,14 @@ import { loadMidiFile } from "./midiFileHandler";
 
 
 // put this in seperate file or dont idc
-document.getElementById("loadSmallPiano").addEventListener("click", function() {
-    loadPianoModel("smaller_piano.gltf");
-});
 
-document.getElementById("loadBigPiano").addEventListener("click", function() {
-    loadPianoModel("bigger_piano.gltf");
-});
+// document.getElementById("loadSmallPiano").addEventListener("click", function() {
+//     loadPianoModel("smaller_piano.gltf");
+// });
+
+// document.getElementById("loadBigPiano").addEventListener("click", function() {
+//     loadPianoModel("bigger_piano.gltf");
+// }); 
 
 
 document.getElementById("midiFileInput").addEventListener("change", function(event) {
@@ -103,13 +104,12 @@ let Selector_Right = null
 
 
 let pianoModelName = "" //to fix a bug of playing notes that arent there
+//doesnt matter now ive just decided to use the big piano but EH
 
 const loader = new GLTFLoader();
 function loadPianoModel(filename) {
 
     pianoModelName = filename;
-
-
 
     loader.load(`assets/${filename}`, (gltf) => {
         if (scene.children.some(child => child.name === "PianoModel")) {
@@ -146,9 +146,8 @@ function loadPianoModel(filename) {
     });
 
 }
-loadPianoModel("smaller_piano.gltf");
-//smaller_piano.gltf
-//bigger_piano.gltf
+loadPianoModel("bigger_piano.gltf");
+//TODO add other instruments it the future....
 
 
 window.addEventListener("resize", function () {
@@ -293,7 +292,6 @@ function playSound(noteName, instNumber) {
         maxNote = "E";
         maxOctave = 6;
     }
-
 
 
     if ((octave > minOctave || (octave === minOctave && noteCompare(note, minNote) >= 0)) &&

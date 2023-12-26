@@ -39,25 +39,45 @@
 				<button id="clearLoopButton">Clear Loop Points</button>
 			</div>
 			
-			<img id="exit-icon" src="assets/exit.svg" alt="">
+			<img class="exit-icon" id="exit-icon-midi" src="assets/exit.svg" alt="">
 			
 			
 		</div>
 			
-		<div class="Size-Control-Center">
-			<div class="Size-Control">
-				<button id="loadSmallPiano">Small</button>
-				<button id="loadBigPiano">Big</button>
-			</div>
-		</div>
+		<!-- <div class="Size-Control-Center">
+			<div class="Size-Control"> -->
+				<!-- <button id="loadSmallPiano">Small</button> -->
+				<!-- <button id="loadBigPiano">Big</button> -->
+			<!-- </div> -->
+		<!-- </div> -->
 
 
+		<div class="Effects-Control">
+
+            <div class="control">
+                <label for="reverbDecay">Reverb Decay:</label>
+                <input type="range" id="reverbDecay" min="0.1" max="10" step="0.1" value="1.5">
+                <span id="reverbDecayValue">1.5</span>
+
+				<input type="checkbox" id="reverbEnabled" title="On/Off" unchecked >
+
+            </div>
+
+            <div class="control">
+				<label for="autoWahBaseFrequency">AutoWah Base Frequency:</label>
+				<input type="range" id="autoWahBaseFrequency" min="20" max="200" step="10" value="50">
+				<span id="autoWahBaseFrequencyValue">50</span>
+				<input type="checkbox" id="autoWahEnabled" title="On/Off" unchecked>
+			</div>	
+			
+			<img  class="exit-icon" id="exit-icon-effects" src="assets/exit.svg" alt="">
 
 	</div>
-	
+
+
 
 		<script type="module" src="/main.js"></script>
-		<script src="/ui-interactions.js"></script>
+		<script src="ui-interactions.js"></script>
 
 	</body>
 </html>

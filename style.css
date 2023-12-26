@@ -70,14 +70,22 @@ body {
   padding-top: .5rem;
 
 }
-#exit-icon{
+.exit-icon {
   width: 3rem;
   filter: invert(11%) sepia(57%) saturate(5372%) hue-rotate(8deg) brightness(98%) contrast(120%);
-
-
+  transition: filter 0.3s;
 }
 
-#exit-icon:hover{
+.exit-icon:hover {
   cursor: pointer;
   filter: none;
+}
+
+
+
+.Effects-Control{
+  display: none;
+  justify-content: center;
+  margin-top: 1rem;  
+  gap: 1rem;
 }
