@@ -34,8 +34,8 @@ To change Instruments use "-" and "="<br>
 - [ ] **More Instruments**: Instead of just a piano perhaps a custom synth....
 - [ ] **Real Time Connection Online**: Play at the same time as your friends online!
 - [ ] **Record+Export Midi Data**
-- [ ] **General Bug Fixes**: Please report them to me so I know what to fix!
 - [ ] **Scale Mode**: Only play the notes inside of a certain scale
+- [ ] **General Bug Fixes**: Please report them to me so I know what to fix!
 
 
 ## Conclusion
