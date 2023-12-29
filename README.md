@@ -17,12 +17,12 @@ To change Instruments use "-" and "="<br>
 
 #### Features So Far!
 
-- [x] **Different Piano Sounds**: Choose from a variety of piano sounds to personalize your playing experience.
-- [x] **Note Highlighting**: Visual cues that make learning and playing along easier.
-- [x] **Midi Keyboard Support**: Connect your MIDI keyboard for a more authentic piano-playing experience.
+- [x] **Different Piano Sounds**: Choose from a variety of piano sounds.
+- [x] **Note Highlighting**: Highlight the notes you're playing and imported from MIDI
+- [x] **Midi Keyboard Support**: Connect your MIDI keyboard for an interactive experience.
 - [x] **Computer Keyboard Support**: Play the piano using your computer keyboard - no extra hardware needed.
-- [x] **Raycasting for Mouse Interaction**: Play the piano by clicking on the keys with your mouse, thanks to advanced raycasting.
-- [x] **File Upload and Playback**: Upload MIDI files and play them back on the 3D piano.
+- [x] **Raycasting for Mouse Interaction**: Play the piano by clicking on the keys with your mouse, thanks to raycasting.
+- [x] **File Upload and Playback**: Upload MIDI files and play them back on the 3D piano (with the notes highlighted).
 - [x] **Looping for Practice**: Focus on learning specific sections of a song with the looping feature.
 
 ---
@@ -35,6 +35,7 @@ To change Instruments use "-" and "="<br>
 - [ ] **Real Time Connection Online**: Play at the same time as your friends online!
 - [ ] **Record+Export Midi Data**
 - [ ] **General Bug Fixes**: Please report them to me so I know what to fix!
+- [ ] **Scale Mode**: Only play the notes inside of a certain scale
 
 
 ## Conclusion
