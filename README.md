@@ -1,5 +1,9 @@
 ## 3D Piano Site
 
+**[glouiie.github.io/Midi-Site](https://glouiie.github.io/Midi-Site/)**
+
+##https://glouiie.github.io/Midi-Site/##
+
 Welcome to my musical passion project - The 3D Piano Site! 
 Leveraging the powerful 3js and Tone.js libraries, I've built an interactive and immersive piano-playing experience that you can enjoy right in your web browser!
 
