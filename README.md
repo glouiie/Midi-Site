@@ -1,6 +1,6 @@
 ## 3D Piano Site
 
-**[glouiie.github.io/Midi-Site](https://glouiie.github.io/Midi-Site/)**
+[glouiie.github.io/Midi-Site](https://glouiie.github.io/Midi-Site/)
 
 ##https://glouiie.github.io/Midi-Site/##
 
